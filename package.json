@@ -4,7 +4,9 @@
   "main": "index.js",
   "scripts": {
     "test": "vitest run",
-    "test:watch": "vitest"
+    "test:watch": "vitest",
+    "lint": "eslint src --ext .ts",
+    "lint:fix": "eslint src --ext .ts --fix"
   },
   "keywords": [],
   "author": "",
@@ -12,8 +14,16 @@
   "type": "commonjs",
   "description": "",
   "devDependencies": {
+    "@faker-js/faker": "^9.4.0",
+    "@rocketseat/eslint-config": "^2.2.2",
     "@types/node": "^22.10.7",
+    "eslint": "^8.57.1",
+    "eslint-plugin-vitest-globals": "^1.5.0",
     "typescript": "^5.7.3",
+    "vite-tsconfig-paths": "^5.1.4",
     "vitest": "^3.0.2"
+  },
+  "dependencies": {
+    "dayjs": "^1.11.13"
   }
 }
