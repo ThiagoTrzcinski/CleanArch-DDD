@@ -2,6 +2,7 @@ import { InMemoryQuestionsRepository } from 'test/repositories/in-memory-questio
 import { makeQuestion } from 'test/factories/make-question'
 import { UniqueEntityId } from '@/core/entities/unique-entity-id'
 import { EditQuestionUseCase } from './edit-question'
+import { UnauthorizedError } from './errors/unauthorized-error'
 
 let inMemoryQuestionsRepository: InMemoryQuestionsRepository
 let sut: EditQuestionUseCase
@@ -39,15 +40,14 @@ describe('Edit question', () => {
     )
 
     inMemoryQuestionsRepository.create(newQuestion)
+    const result = await sut.execute({
+      questionId: newQuestion.id.toValue(),
+      authorId: 'A2',
+      title: 'Another title',
+      content: 'Another question',
+    })
 
-    expect(
-      async () =>
-        await sut.execute({
-          questionId: newQuestion.id.toValue(),
-          authorId: 'A2',
-          title: 'Another title',
-          content: 'Another question',
-        }),
-    ).rejects.toBeInstanceOf(Error)
+    expect(result.isLeft()).toBe(true)
+    expect(result.value).toBeInstanceOf(UnauthorizedError)
   })
 })

@@ -2,6 +2,7 @@ import { InMemoryAnswersRepository } from 'test/repositories/in-memory-answers-r
 import { makeAnswer } from 'test/factories/make-answer'
 import { UniqueEntityId } from '@/core/entities/unique-entity-id'
 import { EditAnswerUseCase } from './edit-answer'
+import { UnauthorizedError } from './errors/unauthorized-error'
 
 let inMemoryAnswersRepository: InMemoryAnswersRepository
 let sut: EditAnswerUseCase
@@ -30,7 +31,7 @@ describe('Edit answer', () => {
       content: 'Another answer',
     })
   })
-  it('should not be able to delete a answer from another user', async () => {
+  it('should not be able to edit a answer from another user', async () => {
     const newAnswer = makeAnswer(
       { authorId: new UniqueEntityId('A1') },
       new UniqueEntityId('1'),
@@ -38,13 +39,13 @@ describe('Edit answer', () => {
 
     inMemoryAnswersRepository.create(newAnswer)
 
-    expect(
-      async () =>
-        await sut.execute({
-          answerId: newAnswer.id.toValue(),
-          authorId: 'A2',
-          content: 'Another answer',
-        }),
-    ).rejects.toBeInstanceOf(Error)
+    const result = await sut.execute({
+      answerId: newAnswer.id.toValue(),
+      authorId: 'A2',
+      content: 'Another answer',
+    })
+
+    expect(result.isLeft()).toBe(true)
+    expect(result.value).toBeInstanceOf(UnauthorizedError)
   })
 })
